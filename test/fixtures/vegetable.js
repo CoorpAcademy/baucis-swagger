@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const async = require('async');
-const baucis = require('baucis');
+const baucis = require('@coorpacademy/baucis');
 require('../..');
 const config = require('./config');
 
