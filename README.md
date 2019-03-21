@@ -1,6 +1,7 @@
 baucis-swagger
 ==============
 
+[![Npm version](https://img.shields.io/npm/v/@coorpacademy/baucis-swagger.svg)](https://www.npmjs.com/package/@coorpacademy/baucis-swagger
 [![Build Status](https://travis-ci.com/CoorpAcademy/baucis-swagger.svg?branch=master)](https://travis-ci.com/CoorpAcademy/baucis-swagger)
 [![codecov](https://codecov.io/gh/CoorpAcademy/baucis-swagger/branch/master/graph/badge.svg)](https://codecov.io/gh/CoorpAcademy/baucis-swagger)
 
