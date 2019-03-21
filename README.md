@@ -1,6 +1,14 @@
 baucis-swagger
 ==============
 
+[![Build Status](https://travis-ci.com/CoorpAcademy/baucis-swagger.svg?branch=master)](https://travis-ci.com/CoorpAcademy/baucis-swagger)
+[![codecov](https://codecov.io/gh/CoorpAcademy/baucis-swagger/branch/master/graph/badge.svg)](https://codecov.io/gh/CoorpAcademy/baucis-swagger)
+
+:warning: This is a from the Coorpacademy Tech team :warning:
+This is so far intended for intern use
+
+--------
+
 This module generates customizable swagger definitions for your Baucis API.  Use this module in conjunction with [Baucis](https://github.com/wprl/baucis).
 
     npm install --save baucis baucis-swagger
@@ -26,11 +34,3 @@ If you want to modify the swagger definition, generate the definition first.  (T
 controller.generateSwagger();
 controller.swagger.xyz = '123';
 ```
-
-Contact
--------
-
- * http://kun.io/
- * @wprl
-
-&copy; 2014-2015 William P. Riley-Land
