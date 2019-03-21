@@ -1,12 +1,12 @@
 // This is a Controller mixin to add methods for generating Swagger data.
 
 // __Dependencies__
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 // __Private Members__
 
 // Convert a Mongoose type into a Swagger type
-function swaggerTypeFor (type) {
+function swaggerTypeFor(type) {
   if (!type) return null;
   if (type === String) return 'string';
   if (type === Number) return 'double';
@@ -15,36 +15,35 @@ function swaggerTypeFor (type) {
   if (type === mongoose.Schema.Types.ObjectId) return 'string';
   if (type === mongoose.Schema.Types.Oid) return 'string';
   if (type === mongoose.Schema.Types.Array) return 'Array';
-  if (Array.isArray(type) || type.name === "Array") return 'Array';
+  if (Array.isArray(type) || type.name === 'Array') return 'Array';
   if (type === Object) return null;
   if (type instanceof Object) return null;
   if (type === mongoose.Schema.Types.Mixed) return null;
   if (type === mongoose.Schema.Types.Buffer) return null;
-  throw new Error('Unrecognized type: ' + type);
+  throw new Error(`Unrecognized type: ${type}`);
 }
 
 // A method for capitalizing the first letter of a string
-function capitalize (s) {
+function capitalize(s) {
   if (!s) return s;
   if (s.length === 1) return s.toUpperCase();
   return s[0].toUpperCase() + s.substring(1);
 }
 
 // __Module Definition__
-var decorator = module.exports = function () {
-  var controller = this;
+module.exports = function() {
+  const controller = this;
 
   // __Private Instance Members__
 
   // A method used to generated a Swagger property for a model
-  function generatePropertyDefinition (name, path) {
-    var property = {};
-    var schema = controller.model().schema;
-    var select = controller.select();
-    var type = path.options.type ? swaggerTypeFor(path.options.type) : 'string'; // virtuals don't have type
-    var mode = (select && select.match(/(?:^|\s)[-]/g)) ? 'exclusive' : 'inclusive';
-    var exclusiveNamePattern = new RegExp('\\B-' + name + '\\b', 'gi');
-    var inclusiveNamePattern = new RegExp('(?:\\B[+]|\\b)' + name + '\\b', 'gi');
+  function generatePropertyDefinition(name, path) {
+    const property = {};
+    const select = controller.select();
+    const type = path.options.type ? swaggerTypeFor(path.options.type) : 'string'; // virtuals don't have type
+    const mode = select && select.match(/(?:^|\s)[-]/g) ? 'exclusive' : 'inclusive';
+    const exclusiveNamePattern = new RegExp(`\\B-${name}\\b`, 'gi');
+    const inclusiveNamePattern = new RegExp(`(?:\\B[+]|\\b)${name}\\b`, 'gi');
 
     // Keep deselected paths private
     if (path.selected === false) return;
@@ -54,7 +53,8 @@ var decorator = module.exports = function () {
     // If it's excluded, skip this one.
     if (select && mode === 'exclusive' && select.match(exclusiveNamePattern)) return;
     // If the mode is inclusive but the name is not present, skip this one.
-    if (select && mode === 'inclusive' && name !== '_id' && !select.match(inclusiveNamePattern)) return;
+    if (select && mode === 'inclusive' && name !== '_id' && !select.match(inclusiveNamePattern))
+      return;
 
     // Configure the property
     property.required = path.options.required || false; // TODO _id is required for PUT
@@ -62,12 +62,12 @@ var decorator = module.exports = function () {
 
     // Set enum values if applicable
     if (path.enumValues && path.enumValues.length > 0) {
-      property.allowableValues = { valueType: 'LIST', values: path.enumValues };
+      property.allowableValues = {valueType: 'LIST', values: path.enumValues};
     }
 
     // Set allowable values range if min or max is present
     if (!isNaN(path.options.min) || !isNaN(path.options.max)) {
-      property.allowableValues = { valueType: 'RANGE' };
+      property.allowableValues = {valueType: 'RANGE'};
     }
 
     if (!isNaN(path.options.min)) {
@@ -79,7 +79,9 @@ var decorator = module.exports = function () {
     }
 
     if (!property.type) {
-      console.log('Warning: That field type is not yet supported in baucis Swagger definitions, using "string."');
+      console.log(
+        'Warning: That field type is not yet supported in baucis Swagger definitions, using "string."'
+      );
       console.log('Path name: %s.%s', capitalize(controller.model().singular()), name);
       console.log('Mongoose type: %s', path.options.type);
       property.type = 'string';
@@ -89,38 +91,38 @@ var decorator = module.exports = function () {
   }
 
   // A method used to generate a Swagger model definition for a controller
-  function generateModelDefinition () {
-    var definition = {};
-    var schema = controller.model().schema;
+  function generateModelDefinition() {
+    const definition = {};
+    const schema = controller.model().schema;
 
     definition.id = capitalize(controller.model().singular());
     definition.properties = {};
 
-    Object.keys(schema.paths).forEach(function (name) {
-      var path = schema.paths[name];
-      var property = generatePropertyDefinition(name, path);
+    Object.keys(schema.paths).forEach(function(name) {
+      const path = schema.paths[name];
+      const property = generatePropertyDefinition(name, path);
       definition.properties[name] = property;
     });
 
-    Object.keys(schema.virtuals).forEach(function (name) {
-      var path = schema.virtuals[name];
-      var property = generatePropertyDefinition(name, path);
+    Object.keys(schema.virtuals).forEach(function(name) {
+      const path = schema.virtuals[name];
+      const property = generatePropertyDefinition(name, path);
       definition.properties[name] = property;
     });
 
     return definition;
-  };
+  }
 
   // Generate parameter list for operations
-  function generateParameters (verb, plural) {
-    var parameters = [];
+  function generateParameters(verb, plural) {
+    const parameters = [];
 
     // Parameters available for singular routes
     if (!plural) {
       parameters.push({
         paramType: 'path',
         name: 'id',
-        description: 'The ID of a ' + controller.model().singular(),
+        description: `The ID of a ${controller.model().singular()}`,
         dataType: 'string',
         required: true,
         allowMultiple: false
@@ -129,7 +131,8 @@ var decorator = module.exports = function () {
       parameters.push({
         paramType: 'header',
         name: 'X-Baucis-Update-Operator',
-        description: '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set.',
+        description:
+          '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set.',
         dataType: 'string',
         required: false,
         allowMultiple: false
@@ -227,10 +230,10 @@ var decorator = module.exports = function () {
     }
 
     return parameters;
-  };
+  }
 
-  function generateErrorResponses (plural) {
-    var errorResponses = [];
+  function generateErrorResponses(plural) {
+    const errorResponses = [];
 
     // TODO other errors (400, 403, etc. )
 
@@ -238,7 +241,7 @@ var decorator = module.exports = function () {
     if (!plural) {
       errorResponses.push({
         code: 404,
-        reason: 'No ' + controller.model().singular() + ' was found with that ID.'
+        reason: `No ${controller.model().singular()} was found with that ID.`
       });
     }
 
@@ -246,7 +249,7 @@ var decorator = module.exports = function () {
     if (plural) {
       errorResponses.push({
         code: 404,
-        reason: 'No ' + controller.model().plural() + ' matched that query.'
+        reason: `No ${controller.model().plural()} matched that query.`
       });
     }
 
@@ -254,16 +257,16 @@ var decorator = module.exports = function () {
     // None.
 
     return errorResponses;
-  };
+  }
 
   // Generate a list of a controller's operations
-  function generateOperations (plural) {
-    var operations = [];
+  function generateOperations(plural) {
+    const operations = [];
 
-    controller.methods().forEach(function (verb) {
-      var operation = {};
-      var titlePlural = capitalize(controller.model().plural());
-      var titleSingular = capitalize(controller.model().singular());
+    controller.methods().forEach(function(verb) {
+      const operation = {};
+      const titlePlural = capitalize(controller.model().plural());
+      const titleSingular = capitalize(controller.model().singular());
 
       // Don't do head, post/put for single/plural
       if (verb === 'head') return;
@@ -276,12 +279,15 @@ var decorator = module.exports = function () {
       operation.httpMethod = verb.toUpperCase();
 
       if (plural) operation.nickname = verb + titlePlural;
-      else operation.nickname = verb + titleSingular + 'ById';
+      else operation.nickname = `${verb + titleSingular}ById`;
 
       operation.responseClass = titleSingular; // TODO sometimes an array!
 
-      if (plural) operation.summary = capitalize(verb) + ' some ' + controller.model().plural();
-      else operation.summary = capitalize(verb) + ' a ' + controller.model().singular() + ' by its unique ID';
+      if (plural) operation.summary = `${capitalize(verb)} some ${controller.model().plural()}`;
+      else
+        operation.summary = `${capitalize(
+          verb
+        )} a ${controller.model().singular()} by its unique ID`;
 
       operation.parameters = generateParameters(verb, plural);
       operation.errorResponses = generateErrorResponses(plural);
@@ -290,30 +296,30 @@ var decorator = module.exports = function () {
     });
 
     return operations;
-  };
+  }
 
   // __Build the Definition__
-  controller.generateSwagger = function () {
+  controller.generateSwagger = function() {
     if (controller.swagger) return controller;
 
-    var modelName = capitalize(controller.model().singular());
+    const modelName = capitalize(controller.model().singular());
 
-    controller.swagger = { apis: [], models: {} };
+    controller.swagger = {apis: [], models: {}};
 
     // Model
     controller.swagger.models[modelName] = generateModelDefinition();
 
     // Instance route
     controller.swagger.apis.push({
-      path: '/' + controller.model().plural() + '/{id}',
-      description: 'Operations about a given ' + controller.model().singular(),
+      path: `/${controller.model().plural()}/{id}`,
+      description: `Operations about a given ${controller.model().singular()}`,
       operations: generateOperations(false)
     });
 
     // Collection route
     controller.swagger.apis.push({
-      path: '/' + controller.model().plural(),
-      description: 'Operations about ' + controller.model().plural(),
+      path: `/${controller.model().plural()}`,
+      description: `Operations about ${controller.model().plural()}`,
       operations: generateOperations(true)
     });
 

@@ -1,20 +1,19 @@
-var expect = require('expect.js');
-var request = require('request');
-var baucis = require('baucis');
+const expect = require('expect.js');
+const request = require('request');
 
-var fixtures = require('./fixtures');
+const fixtures = require('./fixtures');
 
-describe('Swagger Resource Listing', function () {
+describe('Swagger Resource Listing', function() {
   before(fixtures.vegetable.init);
   beforeEach(fixtures.vegetable.create);
   after(fixtures.vegetable.deinit);
 
-  it('should generate the correct listing', function (done) {
-    var options = {
+  it('should generate the correct listing', function(done) {
+    const options = {
       url: 'http://127.0.0.1:8012/api/documentation',
       json: true
     };
-    request.get(options, function (err, response, body) {
+    request.get(options, function(err, response, body) {
       if (err) return done(err);
 
       expect(response).to.have.property('statusCode', 200);
@@ -37,12 +36,12 @@ describe('Swagger Resource Listing', function () {
     });
   });
 
-  it('should generate the correct API definition', function (done) {
-    var options = {
+  it('should generate the correct API definition', function(done) {
+    const options = {
       url: 'http://127.0.0.1:8012/api/documentation/vegetables',
       json: true
     };
-    request.get(options, function (err, response, body) {
+    request.get(options, function(err, response, body) {
       if (err) return done(err);
 
       expect(response).to.have.property('statusCode', 200);
@@ -81,12 +80,12 @@ describe('Swagger Resource Listing', function () {
     });
   });
 
-  it("should copy all properties from the controller's swagger object", function (done) {
-    var options = {
+  it("should copy all properties from the controller's swagger object", function(done) {
+    const options = {
       url: 'http://127.0.0.1:8012/api/documentation/vegetables',
       json: true
     };
-    request.get(options, function (err, response, body) {
+    request.get(options, function(err, response, body) {
       if (err) return done(err);
       expect(response).to.have.property('statusCode', 200);
       expect(body).to.have.property('lambic', 'kriek');
@@ -94,12 +93,12 @@ describe('Swagger Resource Listing', function () {
     });
   });
 
-  it('should correctly set paths as private even if the path name contains hyphens', function (done) {
-    var options = {
+  it('should correctly set paths as private even if the path name contains hyphens', function(done) {
+    const options = {
       url: 'http://127.0.0.1:8012/api/documentation/fungi',
       json: true
     };
-    request.get(options, function (err, response, body) {
+    request.get(options, function(err, response, body) {
       if (err) return done(err);
 
       expect(response).to.have.property('statusCode', 200);
@@ -112,24 +111,24 @@ describe('Swagger Resource Listing', function () {
     });
   });
 
-  it('should allow adding custom APIs', function (done) {
+  it('should allow adding custom APIs', function(done) {
     fixtures.vegetable.controller.swagger.apis.push({
-      'path': '/vegetables/best',
-      'description': 'Operations on the best vegetable.',
-      'operations': [
+      path: '/vegetables/best',
+      description: 'Operations on the best vegetable.',
+      operations: [
         {
-          'httpMethod': 'GET',
-          'nickname': 'getBestVegetable',
-          'responseClass': 'Vegetable',
-          'summary': 'Get the best vegetable'
+          httpMethod: 'GET',
+          nickname: 'getBestVegetable',
+          responseClass: 'Vegetable',
+          summary: 'Get the best vegetable'
         }
       ]
     });
-    var options = {
+    const options = {
       url: 'http://127.0.0.1:8012/api/documentation/vegetables',
       json: true
     };
-    request.get(options, function (err, response, body) {
+    request.get(options, function(err, response, body) {
       if (err) return done(err);
 
       expect(response).to.have.property('statusCode', 200);
@@ -138,12 +137,12 @@ describe('Swagger Resource Listing', function () {
     });
   });
 
-  it('should generate models correctly', function (done) {
-    var options = {
+  it('should generate models correctly', function(done) {
+    const options = {
       url: 'http://127.0.0.1:8012/api/documentation/geese',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
 
       expect(response).to.have.property('statusCode', 200);
