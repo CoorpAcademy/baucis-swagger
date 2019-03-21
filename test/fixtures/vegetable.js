@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const async = require('async');
 const baucis = require('baucis');
+require('../..');
 const config = require('./config');
 
 // __Private Module Members__
@@ -41,6 +42,7 @@ const fixture = {
       .rest('vegetable')
       .hints(true)
       .comments(true);
+
     fixture.controller.generateSwagger();
     fixture.controller.swagger.lambic = 'kriek';
 
