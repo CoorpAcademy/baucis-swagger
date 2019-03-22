@@ -1,10 +1,5 @@
 // This is a Controller mixin to add methods for generating Swagger data.
 
-// __Dependencies__
-const mongoose = require('mongoose');
-
-// __Private Members__
-
 // Convert a Mongoose type into a Swagger type
 function swaggerTypeFor(type) {
   if (!type) return null;
@@ -12,14 +7,16 @@ function swaggerTypeFor(type) {
   if (type === Number) return 'double';
   if (type === Date) return 'Date';
   if (type === Boolean) return 'boolean';
-  if (type === mongoose.Schema.Types.ObjectId) return 'string';
-  if (type === mongoose.Schema.Types.Oid) return 'string';
-  if (type === mongoose.Schema.Types.Array) return 'Array';
   if (Array.isArray(type) || type.name === 'Array') return 'Array';
-  if (type === Object) return null;
+  // mongoose Types
+  if (type.name === 'ObjectID' || type.name === 'ObjectId') return 'string';
+  if (type.name === 'Oid') return 'string';
+  if (type.name === 'Array') return 'Array';
+  if (type.name === 'Buffer') return null;
+  if (type.name === 'Mixed') return null;
+  // Fallbacks
   if (type instanceof Object) return null;
-  if (type === mongoose.Schema.Types.Mixed) return null;
-  if (type === mongoose.Schema.Types.Buffer) return null;
+  if (type === Object) return null;
   throw new Error(`Unrecognized type: ${type}`);
 }
 
@@ -79,6 +76,7 @@ module.exports = function() {
     }
 
     if (!property.type) {
+      // FIXME: disable this on option.....
       console.log(
         'Warning: That field type is not yet supported in baucis Swagger definitions, using "string."'
       );
